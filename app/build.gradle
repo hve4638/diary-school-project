@@ -6,7 +6,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.mpproject"
+        applicationId "com.example.mp1216_2"
         minSdk 21
         targetSdk 33
         versionCode 1

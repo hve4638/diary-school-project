@@ -1,4 +1,4 @@
-package com.example.mpproject;
+package com.example.mp1216_2;
 
 import org.junit.Test;
 
