@@ -15,8 +15,8 @@ import android.widget.LinearLayout;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends AppCompatActivity implements ActionBar.TabListener {
-    MyFragment mFragmentGlobal[] = new MyFragment[2];
-    ActionBar.Tab tag_dog, tag_cat;
+    Fragment mFragmentGlobal[] = new Fragment[3];
+    ActionBar.Tab tag_dog, tag_cat, tag_write;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,16 +26,22 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
         tag_dog = bar.newTab().setText("dog").setTabListener(this);
         tag_cat = bar.newTab().setText("cat").setTabListener(this);
+        tag_write = bar.newTab().setText("write").setTabListener(this);
         bar.addTab(tag_dog);
         bar.addTab(tag_cat);
+        bar.addTab(tag_write);
     }
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        MyFragment myFragInst = null;
+        Fragment myFragInst = null;
+        int index = tab.getPosition();
 
-        if(mFragmentGlobal[tab.getPosition()] == null) {
-            myFragInst = new MyFragment();
+        if(mFragmentGlobal[index] != null) {
+            myFragInst = mFragmentGlobal[tab.getPosition()];
+        }
+        else if (index == 2) {
+            myFragInst = new WriteFragment();
             Bundle data = new Bundle();
 
             data.putString("tabName", tab.getText().toString());
@@ -44,7 +50,13 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
             mFragmentGlobal[tab.getPosition()] = myFragInst;
         }
         else {
-            myFragInst = mFragmentGlobal[tab.getPosition()];
+            myFragInst = new MyFragment();
+            Bundle data = new Bundle();
+
+            data.putString("tabName", tab.getText().toString());
+
+            myFragInst.setArguments(data);
+            mFragmentGlobal[tab.getPosition()] = myFragInst;
         }
 
         ft.replace(android.R.id.content, myFragInst);
