@@ -1,5 +1,5 @@
 package com.example.mpproject;
 
-public interface IBackPress {
+public interface IFrag {
     void onBackPressed();
 }

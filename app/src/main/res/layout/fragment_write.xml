@@ -20,7 +20,7 @@
             >
             <EditText
                 android:layout_margin="1dp"
-                android:id="@+id/etTitle"
+                android:id="@+id/edtTitle"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:layout_weight="8"
@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="5dp"
             />
-        <EditText android:id="@+id/edtText"
+        <EditText android:id="@+id/edtContents"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"

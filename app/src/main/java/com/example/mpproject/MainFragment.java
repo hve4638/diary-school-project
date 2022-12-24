@@ -12,38 +12,34 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link WriteFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class MainFragment extends Fragment {
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     LinearLayout scrollList;
+    FloatingActionButton btnAddMemo;
     View view;
     Context context;
+    MemoDAO memoDAO;
+    HLayout hLayout;
 
     public MainFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment WriteFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static MainFragment newInstance(String param1, String param2) {
         MainFragment fragment = new MainFragment();
         Bundle args = new Bundle();
@@ -61,73 +57,90 @@ public class MainFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_main, container, false);
         context = container.getContext();
-        initView();
+        init();
+
         return view;
+    }
+
+    void init() {
+        memoDAO = MemoDAO.getInstance(context);
+        hLayout = new HLayout(context);
+        initView();
     }
 
     void initView() {
         scrollList = (LinearLayout) view.findViewById(R.id.scrollList);
-        View v = view.findViewById(R.id.vline);
+        btnAddMemo = (FloatingActionButton) view.findViewById(R.id.btnAddMemo);
 
-        ViewGroup.LayoutParams params = v.getLayoutParams();
-        System.out.println("params : " + params.width + "," + params.height);
-
-        for(int i=0;i<100; i++) {
-            int color = (i % 2 == 0) ? Color.BLUE : Color.RED;
-            LinearLayout layout = (LinearLayout)makeDiaryLayout(color);
+        List<Memo> list = memoDAO.getAllMemo();
+        for(Memo memo : list) {
+            View layout = makeDiaryLayout(memo);
             scrollList.addView(layout);
 
-            View vLine = makeLine();
+            View vLine = hLayout.rowLine();
             scrollList.addView(vLine);
-
-            //System.out.println("text : " + i);
         }
-        //scrollList.addView();
+        btnAddMemo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeWritePage();
+            }
+        });
     }
 
-    View makeDiaryLayout(int color) {
-        LinearLayout layout = new LinearLayout(context);
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layout.setPadding(20, 50, 20, 50);
-        layout.setOrientation(LinearLayout.HORIZONTAL);
+    View makeDiaryLayout(Memo memo) {
+        final int id = memo.id;
+        LinearLayout layout = hLayout.rowLinear();
+        layout.setPadding(30, 30, 30, 30);
 
-        //layout.setBackgroundColor(color);
-        layout.addView(makeTextView());
+        LinearLayout col1 = hLayout.columnLinear(1f);
+        LinearLayout col2 = hLayout.columnLinear(1f);
+
+        layout.addView(col1);
+        layout.addView(hLayout.weightLayout(1f));
+        layout.addView(col2);
+
+        TextView titleView = (TextView)hLayout.wrappedTextViewExtSize(memo.title, 20);
+        TextView dateView = (TextView)hLayout.wrappedTextViewExtSize(getDateString(memo), 10);
+
+        col1.addView(titleView);
+        col2.addView(hLayout.weightLayout(1f));
+        col2.addView(dateView);
         layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showMessage("hello");
+
+                showMessage("id: " + id);
+                changeWritePage(id);
             }
         });
 
         return layout;
     }
 
-    View makeTextView() {
-        TextView tView = new TextView(context);
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        tView.setLayoutParams(params);
-        tView.setText("text test");
-
-        return tView;
-    }
-
-    View makeLine() {
-        View view = new View(context);
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 3);
-        //view.setPadding(20, 50, 20, 50);
-        view.setBackgroundColor(Color.RED);
-        return view;
-
+    String getDateString(Memo memo) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd");   // yyyy-MM-dd HH:mm:ss
+        return formatter.format(memo.date);
     }
 
     void showMessage(String text) {
-        HUtils.showMessage(context.getApplicationContext(), text);
+        HUtils.showMessage(context, text);
+    }
+
+    void changeWritePage() {
+        MainActivity mainAct = ((MainActivity) getActivity());
+        mainAct.changeWriteFragment();
+    }
+
+    void changeWritePage(int id) {
+        MainActivity mainAct = ((MainActivity) getActivity());
+        mainAct.changeWriteFragment(id);
     }
 }

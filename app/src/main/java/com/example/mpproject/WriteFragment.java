@@ -1,5 +1,6 @@
 package com.example.mpproject;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -13,14 +14,20 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
+enum MemoMode {
+    NEW,
+    SHOW,
+    EDIT,
+    LOCK
+}
+
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link WriteFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class WriteFragment extends Fragment implements IBackPress {
-    private static final String DIALOG_DATE = "MainActivity.DateDialog";
-
+public class WriteFragment extends Fragment implements IFrag {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -34,14 +41,20 @@ public class WriteFragment extends Fragment implements IBackPress {
     Context context;
     FrameLayout frameDate;
     DatePicker datePicker;
-    EditText edtText;
-    String title;
-    String contents;
-
+    EditText edtTitle, edtContents;
+    MemoDAO memoDAO;
+    Memo memo;
+    MemoMode mode;
+    HGlobal hGlobal;
 
     public WriteFragment() {
+        memo = new Memo();
+        mode = MemoMode.NEW;
+    }
 
-        // Required empty public constructor
+    public WriteFragment(MemoMode mode, Memo memo) {
+        this.memo = memo;
+        this.mode = mode;
     }
 
     /**
@@ -69,7 +82,6 @@ public class WriteFragment extends Fragment implements IBackPress {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
     }
 
     @Override
@@ -78,34 +90,17 @@ public class WriteFragment extends Fragment implements IBackPress {
         // Inflate the layout for this fragment
         vMain = inflater.inflate(R.layout.fragment_write, container, false);
         context = container.getContext();
-        initView();
-
-        btnDate.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                boolean isVisibility = (frameDate.getVisibility() == View.VISIBLE);
-                setEnableDate(isVisibility);
-            }
-        });
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                HUtils.showMessage(context, "submit");
-            }
-        });
-        datePicker.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                HUtils.showMessage(context, "focus");
-                if (!hasFocus) {
-                    //setEnableDate(false);
-                } else {
-                }
-            }
-        });
+        init();
         
         return vMain;
+    }
+
+    void init() {
+        memoDAO = MemoDAO.getInstance(context);
+        hGlobal = HGlobal.getInstance();
+        initView();
+        initMemoMode();
+        initLayoutListener();
     }
 
     void initView() {
@@ -113,37 +108,59 @@ public class WriteFragment extends Fragment implements IBackPress {
         btnSubmit = vMain.findViewById(R.id.btnWriteSubmit);
         frameDate = vMain.findViewById(R.id.frameDate);
 
-        edtText = vMain.findViewById(R.id.edtText);
+        edtTitle = vMain.findViewById(R.id.edtTitle);
+        edtContents = vMain.findViewById(R.id.edtContents);
         datePicker = vMain.findViewById(R.id.datePicker);
     }
 
-    void setEnableDate(boolean isVisibility) {
-        if (isVisibility) {
-            frameDate.setVisibility(View.GONE);
-            edtText.setClickable(true);
-            edtText.setFocusable(true);
-            edtText.setFocusableInTouchMode(true);
-        } else {
-            frameDate.setVisibility(View.VISIBLE);
-            edtText.setClickable(false);
-            edtText.setFocusable(false);
-            edtText.setFocusableInTouchMode(false);
-            closeKeyboard();
-        }
+    void initMemoMode() {
+        edtTitle.setText(memo.title);
+        edtContents.setText(memo.contents);
     }
 
-    void closeKeyboard() {
-        MainActivity activity = (MainActivity) getActivity();
-        HUtils.closeKeyboard(activity, edtText);
+    void initLayoutListener() {
+        btnDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int day) {
+                        memo.setDate(year, month, day);
+                    }
+                };
+                DatePickerDialog dialog = new DatePickerDialog(context , listener, memo.getYear(), memo.getMonth(), memo.getDay());
+                dialog.show();
+            }
+        });
+        btnSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveMemo();
+                gotoMain();
+            }
+        });
     }
 
-    @Override
+    void saveMemo() {
+        memo.title = edtTitle.getText().toString();
+        memo.contents = edtContents.getText().toString();
+        memoDAO.addMemo(memo);
+    }
+
     public void onBackPressed() {
-        requireActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
-        requireActivity().getSupportFragmentManager().popBackStack();
-        HUtils.showMessage(context, "jhhjhj");
-
+        gotoMain();
+        HUtils.showMessage(context, "back");
     }
+
+    void gotoMain() {
+        MainActivity mainAct = ((MainActivity)getActivity());
+        mainAct.changeMainFragment();
+    }
+
+    void showMessage(String text) {
+        HUtils.showMessage(context, text);
+    }
+
 }
 
 
