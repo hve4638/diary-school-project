@@ -37,8 +37,8 @@ public class WriteFragment extends Fragment implements IFrag {
     private String mParam1;
     private String mParam2;
     View vMain;
-    ImageButton btnDate, btnSubmit;
     Context context;
+    ImageButton btnDate, btnSubmit;
     FrameLayout frameDate;
     DatePicker datePicker;
     EditText edtTitle, edtContents;
@@ -55,6 +55,11 @@ public class WriteFragment extends Fragment implements IFrag {
     public WriteFragment(MemoMode mode, Memo memo) {
         this.memo = memo;
         this.mode = mode;
+    }
+
+    public WriteFragment(Memo memo) {
+        this.memo = memo;
+        this.mode = MemoMode.EDIT;
     }
 
     /**
@@ -110,7 +115,6 @@ public class WriteFragment extends Fragment implements IFrag {
 
         edtTitle = vMain.findViewById(R.id.edtTitle);
         edtContents = vMain.findViewById(R.id.edtContents);
-        datePicker = vMain.findViewById(R.id.datePicker);
     }
 
     void initMemoMode() {
@@ -136,7 +140,7 @@ public class WriteFragment extends Fragment implements IFrag {
             @Override
             public void onClick(View v) {
                 saveMemo();
-                gotoMain();
+                back();
             }
         });
     }
@@ -144,23 +148,69 @@ public class WriteFragment extends Fragment implements IFrag {
     void saveMemo() {
         memo.title = edtTitle.getText().toString();
         memo.contents = edtContents.getText().toString();
+
+        switch(mode) {
+            case NEW:
+                saveMemoNewMode();
+                break;
+            case SHOW:
+            case EDIT:
+                saveMemoEditMode();
+                break;
+        }
+    }
+
+    void saveMemoNewMode() {
+        boolean titleIsEmpty, contentsIsEmpty;
+        titleIsEmpty = memo.title.equals("");
+        contentsIsEmpty = memo.contents.equals("");
+
+        if (titleIsEmpty && contentsIsEmpty) {
+            return;
+        } else if (titleIsEmpty) {
+            memo.title = HUtils.getDateFormat("MM월 dd일의 일기", memo.date);
+        }
+
         memoDAO.addMemo(memo);
     }
 
-    public void onBackPressed() {
-        gotoMain();
-        HUtils.showMessage(context, "back");
+    void saveMemoEditMode() {
+        boolean titleIsEmpty;
+        titleIsEmpty = memo.title.equals("");
+
+        if (titleIsEmpty) {
+            memo.title = HUtils.getDateFormat("MM월 dd일의 일기", memo.date);
+        }
+        memoDAO.editMemo(memo);
     }
 
-    void gotoMain() {
+    @Override
+    public void onBackPressed() {
+        saveMemo();
+        back();
+    }
+
+    void back() {
+        if (mode == MemoMode.NEW) {
+            closeFragment();
+        } else {
+            changeShowFragment();
+        }
+    }
+
+    void closeFragment() {
         MainActivity mainAct = ((MainActivity)getActivity());
         mainAct.changeMainFragment();
+    }
+
+    void changeShowFragment() {
+        MainActivity mainAct = ((MainActivity)getActivity());
+        mainAct.changeFragment(new ShowFragment(memo));
     }
 
     void showMessage(String text) {
         HUtils.showMessage(context, text);
     }
-
 }
 
 

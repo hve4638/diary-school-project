@@ -116,9 +116,7 @@ public class MainFragment extends Fragment {
         layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                showMessage("id: " + id);
-                changeWritePage(id);
+                openMemo(id);
             }
         });
 
@@ -126,12 +124,8 @@ public class MainFragment extends Fragment {
     }
 
     String getDateString(Memo memo) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd");   // yyyy-MM-dd HH:mm:ss
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd");
         return formatter.format(memo.date);
-    }
-
-    void showMessage(String text) {
-        HUtils.showMessage(context, text);
     }
 
     void changeWritePage() {
@@ -142,5 +136,16 @@ public class MainFragment extends Fragment {
     void changeWritePage(int id) {
         MainActivity mainAct = ((MainActivity) getActivity());
         mainAct.changeWriteFragment(id);
+    }
+
+    void openMemo(int id) {
+        Memo memo = memoDAO.getMemoById(id);
+
+        MainActivity mainAct = ((MainActivity) getActivity());
+        mainAct.changeFragment(new ShowFragment(memo));
+    }
+
+    void showMessage(String text) {
+        HUtils.showMessage(context, text);
     }
 }

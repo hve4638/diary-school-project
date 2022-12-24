@@ -5,6 +5,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class HUtils {
     static public void showMessage(Context context, String text) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
@@ -22,5 +25,12 @@ public class HUtils {
             InputMethodManager manager = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    static public String getDateFormat(String pattern, Date date) {
+        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+        String format = formatter.format(date);
+
+        return format;
     }
 }

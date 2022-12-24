@@ -7,10 +7,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
+import android.view.Window;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends AppCompatActivity implements ActionBar.TabListener {
-    Fragment mFragmentGlobal[] = new Fragment[3];
+    Fragment mFragmentGlobal[] = new Fragment[5];
     Fragment mainFragment;
     Fragment currentFragment = null;
     int lastTabIndex = 0;
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActionBar bar = getSupportActionBar();
+
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         initFragment();
@@ -32,8 +34,8 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     void initTab(ActionBar bar) {
         tMain = appendTab(bar, "main");
-        tWrite = appendTab(bar, "write");
         tSetting = appendTab(bar, "option");
+        appendTab(bar, "debugdb");
     }
 
     ActionBar.Tab appendTab(ActionBar bar, String text) {
@@ -69,8 +71,11 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         switch (tabName) {
             case "main":
                 return new MainFragment();
+            case "debugdb":
+                return new DebugDBFragment();
             case "write":
             case "option":
+
             default:
                 return new BlankFragment();
         }
@@ -121,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
         fragmentTransaction.replace(android.R.id.content, fragment).commit();
         currentFragment = fragment;
+        //showMessage("change: " + currentFragment);
     }
 
     public void showMessage(String text) {

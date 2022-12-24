@@ -14,11 +14,11 @@ import java.util.List;
 
 public class MemoDAO {
     static MemoDAO inst = null;
-    MemoDBHelper memoDB = null;
-    SQLiteDatabase writable;
-    SQLiteDatabase readable;
-    int lastId;
-    int lastEditId;
+    private MemoDBHelper memoDB = null;
+    private SQLiteDatabase writable;
+    private SQLiteDatabase readable;
+    private int lastId;
+    private int lastEditId;
 
     static public MemoDAO getInstance(Context context) {
         if (inst == null) {
@@ -37,7 +37,7 @@ public class MemoDAO {
     }
 
     public int addMemo(Memo memo) {
-        int id = lastId++;
+        int id = ++lastId;
         ContentValues cv = getMemoContentValues(memo, id);
 
         long rowNo = writable.insert("memo", null, cv);
@@ -75,7 +75,7 @@ public class MemoDAO {
     }
 
     private int getLastId() {
-        Cursor cursor = readable.rawQuery("SELECT id FROM memo order by id desc;", null);
+        Cursor cursor = readable.rawQuery("SELECT id FROM memo ORDER BY id DESC;", null);
 
         if (cursor.moveToNext()) {
             return cursor.getInt(0);
@@ -85,7 +85,7 @@ public class MemoDAO {
     }
 
     private int getLastEditId() {
-        Cursor cursor = readable.rawQuery("SELECT lastedit FROM memo order by lastedit desc;", null);
+        Cursor cursor = readable.rawQuery("SELECT lastedit FROM memo ORDER BY lastedit DESC;", null);
 
         if (cursor.moveToNext()) {
             return cursor.getInt(0);
@@ -95,8 +95,12 @@ public class MemoDAO {
     }
 
     public List<Memo> getAllMemo() {
+        return getAllMemo("id");
+    }
+
+    public List<Memo> getAllMemo(String orderBy) {
         List<Memo> list = new LinkedList<Memo>();
-        Cursor cursor = writable.rawQuery("SELECT title, contents, id, date FROM memo;", null);
+        Cursor cursor = writable.rawQuery("SELECT title, contents, id, date FROM memo ORDER BY "+orderBy+" DESC;", null);
 
         while(cursor.moveToNext()) {
             Memo memo = new Memo();
@@ -122,6 +126,22 @@ public class MemoDAO {
         }
 
         return memo;
+    }
+
+
+    public String dbgGetAllMemo() {
+        Cursor cursor = writable.rawQuery("SELECT * FROM memo ORDER BY id DESC;", null);
+
+        String str = "";
+        while(cursor.moveToNext()) {
+            for(int i=0; i<8; i++) {
+                if (i == 3) continue;
+                str += cursor.getString(i) + "\t|\t";
+            }
+            str += "\n";
+        }
+
+        return str;
     }
 }
 
