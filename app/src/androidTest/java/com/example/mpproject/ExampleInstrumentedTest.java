@@ -1,4 +1,4 @@
-package com.example.mp1216_2;
+package com.example.mpproject;
 
 import android.content.Context;
 

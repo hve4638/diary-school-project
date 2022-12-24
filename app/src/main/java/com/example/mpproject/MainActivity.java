@@ -1,4 +1,4 @@
-package com.example.mp1216_2;
+package com.example.mpproject;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -16,7 +16,9 @@ import android.widget.LinearLayout;
 @SuppressWarnings("deprecation")
 public class MainActivity extends AppCompatActivity implements ActionBar.TabListener {
     Fragment mFragmentGlobal[] = new Fragment[3];
-    ActionBar.Tab tag_dog, tag_cat, tag_write;
+    Fragment currentFragment = null;
+    FragmentTransaction fragmentTransaction;
+    ActionBar.Tab tMain, tWrite, tSetting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,42 +26,57 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         ActionBar bar = getSupportActionBar();
         bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        tag_dog = bar.newTab().setText("dog").setTabListener(this);
-        tag_cat = bar.newTab().setText("cat").setTabListener(this);
-        tag_write = bar.newTab().setText("write").setTabListener(this);
-        bar.addTab(tag_dog);
-        bar.addTab(tag_cat);
-        bar.addTab(tag_write);
+        initTab(bar);
+
+
+    }
+
+    void initTab(ActionBar bar) {
+        tMain = appendTab(bar, "main");
+        tWrite = appendTab(bar, "write");
+        tSetting = appendTab(bar, "option");
+    }
+
+    ActionBar.Tab appendTab(ActionBar bar, String text) {
+        ActionBar.Tab tab = bar.newTab().setText(text).setTabListener(this);
+        bar.addTab(tab);
+        return tab;
     }
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        Fragment myFragInst = null;
+        fragmentTransaction = ft;
+        Fragment inst = null;
+        String tabName = tab.getText().toString();
         int index = tab.getPosition();
 
-        if(mFragmentGlobal[index] != null) {
-            myFragInst = mFragmentGlobal[tab.getPosition()];
-        }
-        else if (index == 2) {
-            myFragInst = new WriteFragment();
+        if (mFragmentGlobal[index] == null) {
+            inst = getFragment(tabName);
             Bundle data = new Bundle();
 
-            data.putString("tabName", tab.getText().toString());
+            data.putString("tabName", tabName);
 
-            myFragInst.setArguments(data);
-            mFragmentGlobal[tab.getPosition()] = myFragInst;
-        }
-        else {
-            myFragInst = new MyFragment();
-            Bundle data = new Bundle();
+            inst.setArguments(data);
+            mFragmentGlobal[index] = inst;
 
-            data.putString("tabName", tab.getText().toString());
-
-            myFragInst.setArguments(data);
-            mFragmentGlobal[tab.getPosition()] = myFragInst;
+        } else {
+            inst = mFragmentGlobal[index];
         }
 
-        ft.replace(android.R.id.content, myFragInst);
+        ft.replace(android.R.id.content, inst);
+        currentFragment = inst;
+    }
+
+    Fragment getFragment(String tabName) {
+        switch (tabName) {
+            case "main":
+                return new MainFragment();
+            case "write":
+                return new WriteFragment();
+            case "option":
+            default:
+                return new BlankFragment();
+        }
     }
 
     @Override
@@ -91,9 +108,20 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
             baseLayout.setLayoutParams(parm);
 
 
-            if (tabName=="dog") baseLayout.setBackgroundColor(Color.RED);
+            baseLayout.setBackgroundColor(Color.RED);
 
             return baseLayout;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (currentFragment instanceof IBackPress) {
+            IBackPress iBackPress = (IBackPress)currentFragment;
+            iBackPress.onBackPressed();
+        }
+        else {
+            HUtils.showMessage(getApplicationContext(), "no cur");
         }
     }
 }

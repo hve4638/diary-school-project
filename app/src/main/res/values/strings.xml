@@ -1,5 +1,10 @@
 <resources>
-    <string name="app_name">MP1216_2</string>
+    <string name="app_name">Dairy</string>
+    <string name="add_memo">Dairy</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment">Hello blank fragment33</string>
+    <string name="blank_page">Blank Page</string>
+    <string name="large_text">
+        Material is the metaphor444
+    </string>
 </resources>
