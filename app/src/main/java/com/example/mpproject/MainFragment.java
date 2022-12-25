@@ -78,7 +78,7 @@ public class MainFragment extends Fragment {
         Memo memo = memoDAO.getMemoById(id);
 
         MainActivity mainAct = ((MainActivity) getActivity());
-        mainAct.changeFragment(new ShowFragment(memo));
+        mainAct.changeFragment(new ShowMemoFragment(memo));
     }
 
     void showMessage(String text) {

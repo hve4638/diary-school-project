@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     }
 
     public void changeWriteFragment() {
-        Fragment writeFragment = new WriteFragment();
+        Fragment writeFragment = new EditMemoFragment();
         HGlobal hGlobal = HGlobal.getInstance();
         hGlobal.setMemoMode(MemoMode.NEW);
 

@@ -20,7 +20,7 @@ public class MemoFragment extends Fragment implements IFrag {
     protected MemoDAO memoDAO;
     protected Memo memo;
     protected EditText edtTitle, edtContents;
-    protected ImageButton btnBack, btnEdit, btnOption, btnDate;
+    protected ImageButton btnBack, btnEdit, btnOption, btnDate, btnSubmit;
 
     public MemoFragment() {
         // Required empty public constructor
@@ -35,25 +35,26 @@ public class MemoFragment extends Fragment implements IFrag {
         return vMain;
     }
 
-    void init() {
+    protected void init() {
         memoDAO = MemoDAO.getInstance(context);
         initView();
+        initListener();
 
         edtTitle.setText(memo.title);
         edtContents.setText(memo.contents);
+    }
 
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                closeFragment();
-            }
-        });
-        btnEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                changeEditFragment();
-            }
-        });
+    protected void initView() {
+        edtTitle = vMain.findViewById(R.id.edtTitle);
+        edtContents = vMain.findViewById(R.id.edtContents);
+        btnBack = vMain.findViewById(R.id.btnBack);
+        btnEdit = vMain.findViewById(R.id.btnEdit);
+        btnOption = vMain.findViewById(R.id.btnMemoOption);
+        btnDate = vMain.findViewById(R.id.btnMemoDate);
+        btnSubmit = vMain.findViewById(R.id.btnEditSubmit);
+    }
+
+    protected void initListener() {
         btnOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,7 +72,12 @@ public class MemoFragment extends Fragment implements IFrag {
                                     },
                                     null);
                         } else {
-
+                            HUtils.showLockDialog(context, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    showMessage(":"+ which);
+                                }
+                            }, null, null);
                         }
                         return true;
                     }
@@ -81,23 +87,19 @@ public class MemoFragment extends Fragment implements IFrag {
         });
     }
 
-    void initView() {
-        edtTitle = vMain.findViewById(R.id.edtTitle);
-        edtContents = vMain.findViewById(R.id.edtContents);
-        btnBack = vMain.findViewById(R.id.btnBack);
-        btnEdit = vMain.findViewById(R.id.btnEdit);
-        btnOption = vMain.findViewById(R.id.btnMemoOption);
-        btnDate = vMain.findViewById(R.id.btnMemoDate);
-    }
-
-    void closeFragment() {
+    public void closeFragment() {
         MainActivity mainAct = ((MainActivity)getActivity());
         mainAct.changeMainFragment();
     }
 
-    void changeEditFragment() {
+    public void changeFragment(Fragment fragment) {
         MainActivity mainAct = ((MainActivity)getActivity());
-        mainAct.changeFragment(new WriteFragment(memo));
+        mainAct.changeFragment(fragment);
+    }
+
+    public void changeEditFragment() {
+        MainActivity mainAct = ((MainActivity)getActivity());
+        mainAct.changeFragment(new EditMemoFragment(memo));
     }
 
     @Override
@@ -105,7 +107,7 @@ public class MemoFragment extends Fragment implements IFrag {
         closeFragment();
     }
 
-    void showMessage(String text) {
+    public void showMessage(String text) {
         HUtils.showMessage(context, text);
     }
 }

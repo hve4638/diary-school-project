@@ -14,38 +14,27 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-public class ShowFragment extends Fragment implements IFrag {
-    View vMain;
-    Context context;
-    MemoDAO memoDAO;
-    Memo memo;
-    EditText edtTitle, edtContents;
-    ImageButton btnBack, btnEdit, btnOption;
+public class ShowMemoFragment extends MemoFragment {
 
-    public ShowFragment() {
+    public ShowMemoFragment() {
         // Required empty public constructor
     }
 
-    public ShowFragment(Memo memo) {
+    public ShowMemoFragment(Memo memo) {
         this.memo = memo;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        vMain = inflater.inflate(R.layout.fragment_show, container, false);
-        context = container.getContext();
-        init();
-        // Inflate the layout for this fragment
-        return vMain;
+    protected void initView() {
+        super.initView();
+
+        btnDate.setVisibility(View.GONE);
+        btnSubmit.setVisibility(View.GONE);
     }
 
-    void init() {
-        memoDAO = MemoDAO.getInstance(context);
-        initView();
-
-        edtTitle.setText(memo.title);
-        edtContents.setText(memo.contents);
+    @Override
+    protected void initListener() {
+        super.initListener();
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,7 +63,7 @@ public class ShowFragment extends Fragment implements IFrag {
                                         closeFragment();
                                         showMessage("삭제되었습니다");
                                     },
-                            null);
+                                    null);
                         } else {
 
                         }
@@ -86,31 +75,9 @@ public class ShowFragment extends Fragment implements IFrag {
         });
     }
 
-    void initView() {
-        edtTitle = vMain.findViewById(R.id.edtTitle);
-        edtContents = vMain.findViewById(R.id.edtContents);
-        btnBack = vMain.findViewById(R.id.btnBack);
-        btnEdit = vMain.findViewById(R.id.btnEdit);
-        btnOption = vMain.findViewById(R.id.btnEditOption);
-    }
-
-    void closeFragment() {
-        MainActivity mainAct = ((MainActivity)getActivity());
-        mainAct.changeMainFragment();
-    }
-
-    void changeEditFragment() {
-        MainActivity mainAct = ((MainActivity)getActivity());
-        mainAct.changeFragment(new WriteFragment(memo));
-    }
-
-    @Override
-    public void onBackPressed() {
-        closeFragment();
-    }
-
-    void showMessage(String text) {
-        HUtils.showMessage(context, text);
+    public void changeEditFragment() {
+        MainActivity mainAct = ((MainActivity) getActivity());
+        mainAct.changeFragment(new EditMemoFragment(memo));
     }
 }
 
