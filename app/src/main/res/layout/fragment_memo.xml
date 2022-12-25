@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_weight="1"
     tools:context=".ShowMemoFragment">
 
     <LinearLayout
@@ -65,23 +66,82 @@
                 android:padding="5sp"
                 android:src="@drawable/ic_option" />
         </LinearLayout>
-        <TextView
-            android:id="@+id/tDate"
-            android:layout_width="wrap_content"
-            android:layout_height="5dp"
-            />
-        <EditText android:id="@+id/edtContents"
+        <FrameLayout android:id="@+id/my_content"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:gravity="top|left"
-            android:inputType="textMultiLine"
-            android:scrollHorizontally="true"
-            android:minWidth="10.0dip"
-            android:maxWidth="5.0dip"
-            android:focusable="false"
-            android:clickable="false"
+            android:padding="5dp">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    >
+
+                    <FrameLayout
+                        android:id="@+id/imgFrame"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:padding="5dp">
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:id="@+id/imgPicture"
+                            />
+                    </FrameLayout>
+                    <EditText
+                        android:id="@+id/edtContents"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="top|left"
+                        android:inputType="textMultiLine"
+                        android:scrollHorizontally="true"
+                        android:minWidth="10.0dip"
+                        android:maxWidth="5.0dip"
+                        android:focusable="false"
+                        android:clickable="false"
+                        android:background="@null"
+                        />
+                </LinearLayout>
+            </ScrollView>
+        </FrameLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#B4393939"
             />
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:id="@+id/bottomBar"
+            >
+            <ImageButton
+                android:id="@+id/btnGallery"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="@null"
+                android:scaleType="centerCrop"
+
+                android:src="@drawable/ic_gallery"
+                />
+            <View
+                android:layout_width="10dp"
+                android:layout_height="5dp"
+                />
+            <ImageButton
+                android:id="@+id/btnCamera"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:background="@null"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_camera"
+                />
+        </LinearLayout>
     </LinearLayout>
 </FrameLayout>

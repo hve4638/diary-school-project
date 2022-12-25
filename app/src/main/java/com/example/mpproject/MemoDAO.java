@@ -75,6 +75,7 @@ public class MemoDAO {
         cv.put("contents", memo.contents);
         cv.put("passwd", memo.passwd);
         cv.put("date", getDateFormat(memo.date));
+        cv.put("image", memo.imagePath);
         return cv;
     }
 
@@ -104,7 +105,7 @@ public class MemoDAO {
 
     public List<Memo> getAllMemo(String orderBy) {
         List<Memo> list = new LinkedList<Memo>();
-        Cursor cursor = writable.rawQuery("SELECT title, contents, id, date FROM memo ORDER BY "+orderBy+" DESC;", null);
+        Cursor cursor = writable.rawQuery("SELECT title, contents, id, date, locklevel FROM memo ORDER BY "+orderBy+" DESC;", null);
 
         while(cursor.moveToNext()) {
             Memo memo = new Memo();
@@ -112,6 +113,7 @@ public class MemoDAO {
             memo.contents = cursor.getString(1);
             memo.id = cursor.getInt(2);
             memo.parseDate(cursor.getString(3));
+            memo.lockLevel = LockLevel.parseInt(cursor.getInt(4));
 
             list.add(memo);
         }
@@ -121,12 +123,18 @@ public class MemoDAO {
 
     public Memo getMemoById(int id) {
         Memo memo = new Memo();
-        Cursor cursor = writable.rawQuery("SELECT title, contents, id FROM memo WHERE id = "+id+";", null);
+        Cursor cursor = writable.rawQuery("SELECT id, user, title, contents, locklevel, passwd, date, image FROM memo WHERE id = "+id+";", null);
 
+        //id , user , title , contents , locklevel , passwd , date , lastedit
         if (cursor.moveToNext()) {
-            memo.title = cursor.getString(0);
-            memo.contents = cursor.getString(1);
-            memo.id = cursor.getInt(2);
+            memo.id = cursor.getInt(0);
+            memo.user = cursor.getString(1);
+            memo.title = cursor.getString(2);
+            memo.contents = cursor.getString(3);
+            memo.lockLevel = LockLevel.parseInt(cursor.getInt(4));
+            memo.passwd = cursor.getString(5);
+            memo.parseDate(cursor.getString(6));
+            memo.imagePath = cursor.getString(7);
         }
 
         return memo;
@@ -137,9 +145,9 @@ public class MemoDAO {
 
         String str = "";
         while(cursor.moveToNext()) {
-            for(int i=0; i<8; i++) {
-                if (i == 3) continue;
-                str += cursor.getString(i) + "\t|\t";
+            for(int i=0; i<9; i++) {
+                if (i == 2) continue;
+                str += "'" + cursor.getString(i) + "'\t|\t";
             }
             str += "\n";
         }
@@ -150,12 +158,12 @@ public class MemoDAO {
 
 class MemoDBHelper extends SQLiteOpenHelper {
     public MemoDBHelper(Context context) {
-        super(context, "diary.db", null, 5);
+        super(context, "diary.db", null, 8);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE memo (id INTEGER PRIMARY KEY, user Text, title TEXT, contents TEXT, locklevel INTEGER, passwd TEXT, date TEXT, lastedit INTEGER)");
+        db.execSQL("CREATE TABLE memo (id INTEGER PRIMARY KEY, user Text, title TEXT, contents TEXT, locklevel INTEGER, passwd TEXT, date TEXT, lastedit INTEGER, image TEXT)");
         //db.execSQL("CREATE TABLE memo (user CHAR(20) PRIMARY KEY, id INTEGER, locklevel INTEGER)");
     }
 

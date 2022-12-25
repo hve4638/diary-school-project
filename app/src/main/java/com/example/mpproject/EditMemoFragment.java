@@ -1,8 +1,13 @@
 package com.example.mpproject;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.PopupMenu;
@@ -16,16 +21,23 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import java.io.InputStream;
+
 public class EditMemoFragment extends MemoFragment {
+    static final int REQUEST_GALLERY = 1;
     MemoMode mode;
 
     public EditMemoFragment() {
+        this.memo = new Memo();
         mode = MemoMode.NEW;
     }
 
     public EditMemoFragment(Memo memo) {
         this.memo = memo;
         mode = MemoMode.EDIT;
+        System.out.println("\n\n\n");
+        System.out.println("image:" + memo.toString());
+        System.out.println("\n\n\n");
     }
 
     @Override
@@ -34,6 +46,7 @@ public class EditMemoFragment extends MemoFragment {
 
         btnBack.setVisibility(View.GONE);
         btnEdit.setVisibility(View.GONE);
+        enableWritable(true);
     }
 
     @Override
@@ -59,6 +72,15 @@ public class EditMemoFragment extends MemoFragment {
                 back();
             }
         });
+        btnGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(intent, REQUEST_GALLERY);
+            }
+        });
     }
 
     void saveMemo() {
@@ -76,27 +98,14 @@ public class EditMemoFragment extends MemoFragment {
     }
 
     void saveMemoNewMode() {
-        boolean titleIsEmpty, contentsIsEmpty;
-        titleIsEmpty = memo.title.equals("");
-        contentsIsEmpty = memo.contents.equals("");
-
-        if (titleIsEmpty && contentsIsEmpty) {
-            return;
-        } else if (titleIsEmpty) {
-            memo.title = HUtils.getDateFormat("MM월 dd일의 일기", memo.date);
-        }
-
+        if (memo.title.equals("") && memo.contents.equals("")) return;
+        memo.preprocess(context);
         memoDAO.addMemo(memo);
         showMessage("저장되었습니다");
     }
 
     void saveMemoEditMode() {
-        boolean titleIsEmpty;
-        titleIsEmpty = memo.title.equals("");
-
-        if (titleIsEmpty) {
-            memo.title = HUtils.getDateFormat("MM월 dd일의 일기", memo.date);
-        }
+        memo.preprocess(context);
         memoDAO.editMemo(memo);
         showMessage("저장되었습니다");
     }
@@ -107,6 +116,32 @@ public class EditMemoFragment extends MemoFragment {
         } else {
             showMessage("hiii");
             changeFragment(new ShowMemoFragment(memo));
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_GALLERY:
+                onGallery(resultCode, data);
+                break;
+        }
+    }
+
+    private void onGallery(int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            try {
+                InputStream in = context.getContentResolver().openInputStream(data.getData());
+
+                Bitmap img = BitmapFactory.decodeStream(in);
+                in.close();
+
+                memo.imagePath = "";
+                memo.image = img;
+                setPicture(img);
+            } catch (Exception ex) {
+                showMessage("오류가 발생했습니다");
+            }
         }
     }
 }

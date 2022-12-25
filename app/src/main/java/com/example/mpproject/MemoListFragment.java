@@ -63,7 +63,7 @@ public class MemoListFragment extends Fragment {
         btnAddMemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeWritePage();
+                openNewMemo();
             }
         });
     }
@@ -72,16 +72,35 @@ public class MemoListFragment extends Fragment {
         return memoDAO.getAllMemo();
     }
 
-    void changeWritePage() {
+    void openNewMemo() {
         MainActivity mainAct = ((MainActivity) getActivity());
-        mainAct.changeWriteFragment();
+        mainAct.changeFragment(new EditMemoFragment());
     }
 
     void openMemo(int id) {
         Memo memo = memoDAO.getMemoById(id);
+        if (memo.lockLevel == LockLevel.NOTHING) {
+            changeFragment(new ShowMemoFragment(memo));
+        } else {
+            changeFragmentIfPasswdCorrect(memo);
+        }
+    }
 
+    void changeFragmentIfPasswdCorrect(Memo memo) {
+        String passwd = memo.passwd;
+        HUtils.showInputPasswdDialog(context, (text) -> {
+            if (text.equals(passwd)) {
+                changeFragment(new ShowMemoFragment(memo));
+            } else {
+                showMessage("비밀번호가 틀렸습니다");
+                changeFragmentIfPasswdCorrect(memo);
+            }
+        });
+    }
+
+    void changeFragment(Fragment fragment) {
         MainActivity mainAct = ((MainActivity) getActivity());
-        mainAct.changeFragment(new ShowMemoFragment(memo));
+        mainAct.changeFragment(fragment);
     }
 
     void showMessage(String text) {

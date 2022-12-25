@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -79,6 +80,7 @@ public class HLayout {
     public LinearLayout rowLinear(float weight) {
         LinearLayout layout = new LinearLayout(context);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT, weight);
+        layout.setLayoutParams(params);
         layout.setOrientation(LinearLayout.HORIZONTAL);
 
         return layout;
@@ -91,6 +93,7 @@ public class HLayout {
     public LinearLayout columnLinear(float weight) {
         LinearLayout layout = new LinearLayout(context);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT, weight);
+        layout.setLayoutParams(params);
         layout.setOrientation(LinearLayout.VERTICAL);
 
         return layout;
@@ -104,16 +107,20 @@ public class HLayout {
     }
 
 
-
-
     public View diaryLayout(Memo memo) {
         LinearLayout layout = rowLinear();
+        layout.setMinimumHeight(80);
         layout.setPadding(30, 30, 30, 30);
 
-        LinearLayout col1 = columnLinear(1f);
-        LinearLayout col2 = columnLinear(1f);
+        LinearLayout col1 = columnLinear(0f);
+        LinearLayout col2 = columnLinear(0f);
 
+        View lock = imageLock();
+        if (memo.lockLevel == LockLevel.NOTHING) {
+            lock.setVisibility(View.INVISIBLE);
+        }
         layout.addView(col1);
+        layout.addView(lock);
         layout.addView(weightLayout(1f));
         layout.addView(col2);
 
@@ -130,5 +137,18 @@ public class HLayout {
     private String getDateString(Memo memo) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd");
         return formatter.format(memo.date);
+    }
+
+    public View imageLock() {
+        ImageView iView = new ImageView(context);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(70, 70);
+        iView.setLayoutParams(params);
+        iView.setImageResource(R.drawable.ic_lock);
+
+        iView.setBackground(null);
+        iView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        iView.setPadding(20, 5, 20, 5);
+
+        return iView;
     }
 }

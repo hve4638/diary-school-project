@@ -6,8 +6,14 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.Window;
+
+import java.io.File;
 
 @SuppressWarnings("deprecation")
 public class MainActivity extends AppCompatActivity implements ActionBar.TabListener {
@@ -25,22 +31,13 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         ActionBar bar = getSupportActionBar();
 
         initTab(bar);
-
         showTabs(true);
     }
 
-    void getMainFragment(String tabName) {
-        Fragment inst = getFragment(tabName);
-        Bundle data = new Bundle();
-        data.putString("tabName", tabName);
-        inst.setArguments(data);
-    }
-
     void initTab(ActionBar bar) {
-        tMain = appendTab(bar, "메인", new MainFragment());
         appendTab(bar, "날짜순", new MemoDateOrderFragment());
         appendTab(bar, "최근 편집", new MemoRecentOrderFragment());
-        appendTab(bar, "디버그", new DebugDBFragment());
+        appendTab(bar, "DEBUG", new DebugDBFragment());
     }
 
     ActionBar.Tab appendTab(ActionBar bar, String text, Fragment fragment) {
@@ -51,7 +48,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         data.putString("tabName", text);
         fragment.setArguments(data);
         mFragmentGlobal[cFragmentsIndex++] = fragment;
-
         return tab;
     }
 
@@ -63,19 +59,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         changeFragmentWithoutChangeNavigation(inst);
     }
 
-    Fragment getFragment(String tabName) {
-        switch (tabName) {
-            case "main":
-                return new MainFragment();
-            case "debugdb":
-                return new DebugDBFragment();
-            case "write":
-            case "option":
-
-            default:
-                return new BlankFragment();
-        }
-    }
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) { }
     @Override
@@ -109,8 +92,6 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
     public void changeWriteFragment() {
         Fragment writeFragment = new EditMemoFragment();
-        HGlobal hGlobal = HGlobal.getInstance();
-        hGlobal.setMemoMode(MemoMode.NEW);
 
         changeFragment(writeFragment);
     }

@@ -2,8 +2,12 @@ package com.example.mpproject;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 
@@ -12,7 +16,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 public class MemoFragment extends Fragment implements IFrag {
     protected View vMain;
@@ -20,7 +27,10 @@ public class MemoFragment extends Fragment implements IFrag {
     protected MemoDAO memoDAO;
     protected Memo memo;
     protected EditText edtTitle, edtContents;
-    protected ImageButton btnBack, btnEdit, btnOption, btnDate, btnSubmit;
+    protected ImageButton btnBack, btnEdit, btnOption, btnDate, btnSubmit, btnCamera, btnGallery;
+    protected LinearLayout bottomBar;
+    protected ImageView imgPicture;
+    protected FrameLayout imgFrame;
 
     public MemoFragment() {
         // Required empty public constructor
@@ -42,6 +52,7 @@ public class MemoFragment extends Fragment implements IFrag {
 
         edtTitle.setText(memo.title);
         edtContents.setText(memo.contents);
+        setPicture(memo.image);
     }
 
     protected void initView() {
@@ -52,6 +63,11 @@ public class MemoFragment extends Fragment implements IFrag {
         btnOption = vMain.findViewById(R.id.btnMemoOption);
         btnDate = vMain.findViewById(R.id.btnMemoDate);
         btnSubmit = vMain.findViewById(R.id.btnEditSubmit);
+        btnCamera = vMain.findViewById(R.id.btnCamera);
+        btnGallery = vMain.findViewById(R.id.btnGallery);
+        bottomBar = vMain.findViewById(R.id.bottomBar);
+        imgPicture = vMain.findViewById(R.id.imgPicture);
+        imgFrame = vMain.findViewById(R.id.imgFrame);
     }
 
     protected void initListener() {
@@ -72,19 +88,53 @@ public class MemoFragment extends Fragment implements IFrag {
                                     },
                                     null);
                         } else {
-                            HUtils.showLockDialog(context, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    showMessage(":"+ which);
-                                }
-                            }, null, null);
+                            HUtils.showLockDialog(context, memo.lockLevel, (lockLevel) -> {
+                                onChangeLockLevel(lockLevel);
+                            }, null);
                         }
                         return true;
                     }
                 });
-                popup.show();//showing popup menu
+                popup.show();
             }
         });
+    }
+
+    public void onChangeLockLevel(LockLevel lockLevel) {
+        if (memo.lockLevel == lockLevel) return;
+
+        switch(lockLevel) {
+            case MASTER_KEY:
+                memo.passwd = "";
+                memo.lockLevel = lockLevel;
+                showMessage("메모를 잠궜습니다");
+                break;
+            case PRIVATE_KEY:
+                HUtils.showInputPasswdDialog(context, (text)-> {
+                    setPrivateKey(text);
+                    showMessage("메모를 잠궜습니다");
+                });
+                break;
+            case NOTHING:
+                memo.passwd = "";
+                memo.lockLevel = lockLevel;
+                showMessage("잠금이 해제되었습니다");
+                break;
+        }
+    }
+
+    public void setPrivateKey(String text) {
+        memo.passwd = text;
+        memo.lockLevel = LockLevel.PRIVATE_KEY;
+    }
+
+    public void enableWritable(boolean writable) {
+        edtTitle.setFocusable(writable);
+        edtTitle.setClickable(writable);
+        edtTitle.setFocusableInTouchMode(writable);
+        edtContents.setFocusable(writable);
+        edtContents.setClickable(writable);
+        edtContents.setFocusableInTouchMode(writable);
     }
 
     public void closeFragment() {
@@ -109,5 +159,14 @@ public class MemoFragment extends Fragment implements IFrag {
 
     public void showMessage(String text) {
         HUtils.showMessage(context, text);
+    }
+
+    public void setPicture(@Nullable Bitmap image) {
+        if (image == null) {
+            imgFrame.setVisibility(View.GONE);
+        } else {
+            imgFrame.setVisibility(View.VISIBLE);
+            imgPicture.setImageBitmap(image);
+        }
     }
 }

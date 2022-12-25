@@ -15,9 +15,8 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 public class ShowMemoFragment extends MemoFragment {
-
     public ShowMemoFragment() {
-        // Required empty public constructor
+
     }
 
     public ShowMemoFragment(Memo memo) {
@@ -30,6 +29,9 @@ public class ShowMemoFragment extends MemoFragment {
 
         btnDate.setVisibility(View.GONE);
         btnSubmit.setVisibility(View.GONE);
+        bottomBar.setVisibility(View.GONE);
+        enableWritable(false);
+        memo.tryLoadImage(context);
     }
 
     @Override
@@ -48,36 +50,23 @@ public class ShowMemoFragment extends MemoFragment {
                 changeEditFragment();
             }
         });
-        btnOption.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popup = new PopupMenu(context, v);
-                popup.getMenuInflater().inflate(R.menu.popup, popup.getMenu());
-
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (item.getItemId() == R.id.actionDelete) {
-                            HUtils.showDeleteDialog(context,
-                                    (dialog, which) -> {
-                                        memoDAO.deleteMemo(memo);
-                                        closeFragment();
-                                        showMessage("삭제되었습니다");
-                                    },
-                                    null);
-                        } else {
-
-                        }
-                        return true;
-                    }
-                });
-                popup.show();//showing popup menu
-            }
-        });
     }
 
     public void changeEditFragment() {
         MainActivity mainAct = ((MainActivity) getActivity());
         mainAct.changeFragment(new EditMemoFragment(memo));
+    }
+
+    @Override
+    public void onChangeLockLevel(LockLevel lockLevel) {
+        super.onChangeLockLevel(lockLevel);
+        memoDAO.editMemo(memo);
+    }
+
+    public void setPrivateKey(String text) {
+        memo.passwd = text;
+        memo.lockLevel = LockLevel.PRIVATE_KEY;
+        memoDAO.editMemo(memo);
     }
 }
 
