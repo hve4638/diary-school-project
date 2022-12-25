@@ -54,6 +54,10 @@ public class MemoDAO {
         writable.update("memo", cv, "id=?", new String[] { ((Integer)memo.id).toString() });
     }
 
+    public void deleteMemo(Memo memo) {
+        writable.delete("memo", "id=?", new String[] { ((Integer)memo.id).toString() });
+    }
+
     private String getDateFormat(Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd");   // yyyy-MM-dd HH:mm:ss
         String format = formatter.format(date);
@@ -127,7 +131,6 @@ public class MemoDAO {
 
         return memo;
     }
-
 
     public String dbgGetAllMemo() {
         Cursor cursor = writable.rawQuery("SELECT * FROM memo ORDER BY id DESC;", null);

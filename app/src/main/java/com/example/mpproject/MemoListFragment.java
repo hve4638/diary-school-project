@@ -14,38 +14,39 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-public class MainFragment extends Fragment {
-    View view;
-    Context context;
-    MemoDAO memoDAO;
-    HLayout hLayout;
+public class MemoListFragment extends Fragment {
+    protected View vMain;
+    protected Context context;
+    protected MemoDAO memoDAO;
+    protected HLayout hLayout;
     LinearLayout scrollList;
     FloatingActionButton btnAddMemo;
 
-    public MainFragment() {
-        // Required empty public constructor
+    public MemoListFragment() {
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_main, container, false);
+        vMain = inflater.inflate(R.layout.fragment_memo_list, container, false);
         context = container.getContext();
         init();
 
-        return view;
+        return vMain;
     }
 
     void init() {
         memoDAO = MemoDAO.getInstance(context);
         hLayout = new HLayout(context);
+
         initView();
     }
 
     void initView() {
-        scrollList = (LinearLayout) view.findViewById(R.id.scrollList);
-        btnAddMemo = (FloatingActionButton) view.findViewById(R.id.btnAddMemo);
+        scrollList = (LinearLayout) vMain.findViewById(R.id.scrollList);
+        btnAddMemo = (FloatingActionButton) vMain.findViewById(R.id.btnAddMemo);
 
-        List<Memo> list = memoDAO.getAllMemo();
+        List<Memo> list = getMemoList();
         for(Memo memo : list) {
             final int id = memo.id;
             View layout = hLayout.diaryLayout(memo, new View.OnClickListener() {
@@ -54,19 +55,21 @@ public class MainFragment extends Fragment {
                     openMemo(id);
                 }
             });
-
             scrollList.addView(layout);
 
             View vLine = hLayout.rowLine();
             scrollList.addView(vLine);
         }
-
         btnAddMemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 changeWritePage();
             }
         });
+    }
+
+    List<Memo> getMemoList() {
+        return memoDAO.getAllMemo();
     }
 
     void changeWritePage() {

@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
 
+import java.text.SimpleDateFormat;
+
 public class HLayout {
     final int WRAP_CONTENT = LinearLayout.LayoutParams.WRAP_CONTENT;
     final int MATCH_PARENT = LinearLayout.LayoutParams.MATCH_PARENT;
@@ -92,5 +94,41 @@ public class HLayout {
         layout.setOrientation(LinearLayout.VERTICAL);
 
         return layout;
+    }
+
+    public View diaryLayout(Memo memo, View.OnClickListener listener) {
+        LinearLayout view = (LinearLayout) diaryLayout(memo);
+        view.setOnClickListener(listener);
+
+        return view;
+    }
+
+
+
+
+    public View diaryLayout(Memo memo) {
+        LinearLayout layout = rowLinear();
+        layout.setPadding(30, 30, 30, 30);
+
+        LinearLayout col1 = columnLinear(1f);
+        LinearLayout col2 = columnLinear(1f);
+
+        layout.addView(col1);
+        layout.addView(weightLayout(1f));
+        layout.addView(col2);
+
+        TextView titleView = (TextView)wrappedTextViewExtSize(memo.title, 20);
+        TextView dateView = (TextView)wrappedTextViewExtSize(getDateString(memo), 10);
+
+        col1.addView(titleView);
+        col2.addView(weightLayout(1f));
+        col2.addView(dateView);
+
+        return layout;
+    }
+
+    private String getDateString(Memo memo) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd");
+        return formatter.format(memo.date);
     }
 }

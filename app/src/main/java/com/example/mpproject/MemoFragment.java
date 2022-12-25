@@ -14,26 +14,21 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
-public class ShowFragment extends Fragment implements IFrag {
-    View vMain;
-    Context context;
-    MemoDAO memoDAO;
-    Memo memo;
-    EditText edtTitle, edtContents;
-    ImageButton btnBack, btnEdit, btnOption;
+public class MemoFragment extends Fragment implements IFrag {
+    protected View vMain;
+    protected Context context;
+    protected MemoDAO memoDAO;
+    protected Memo memo;
+    protected EditText edtTitle, edtContents;
+    protected ImageButton btnBack, btnEdit, btnOption, btnDate;
 
-    public ShowFragment() {
+    public MemoFragment() {
         // Required empty public constructor
     }
 
-    public ShowFragment(Memo memo) {
-        this.memo = memo;
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        vMain = inflater.inflate(R.layout.fragment_show, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        vMain = inflater.inflate(R.layout.fragment_memo, container, false);
         context = container.getContext();
         init();
         // Inflate the layout for this fragment
@@ -74,7 +69,7 @@ public class ShowFragment extends Fragment implements IFrag {
                                         closeFragment();
                                         showMessage("삭제되었습니다");
                                     },
-                            null);
+                                    null);
                         } else {
 
                         }
@@ -91,7 +86,8 @@ public class ShowFragment extends Fragment implements IFrag {
         edtContents = vMain.findViewById(R.id.edtContents);
         btnBack = vMain.findViewById(R.id.btnBack);
         btnEdit = vMain.findViewById(R.id.btnEdit);
-        btnOption = vMain.findViewById(R.id.btnEditOption);
+        btnOption = vMain.findViewById(R.id.btnMemoOption);
+        btnDate = vMain.findViewById(R.id.btnMemoDate);
     }
 
     void closeFragment() {
@@ -113,22 +109,3 @@ public class ShowFragment extends Fragment implements IFrag {
         HUtils.showMessage(context, text);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

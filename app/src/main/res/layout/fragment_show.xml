@@ -41,13 +41,13 @@
                 android:padding="5sp"
                 android:src="@drawable/ic_edit" />
             <ImageButton
-                android:id="@+id/btnLock"
+                android:id="@+id/btnEditOption"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:background="@null"
                 android:scaleType="centerCrop"
                 android:padding="5sp"
-                android:src="@drawable/ic_lock" />
+                android:src="@drawable/ic_option" />
         </LinearLayout>
         <TextView
             android:id="@+id/tDate"

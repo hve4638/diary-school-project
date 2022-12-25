@@ -15,56 +15,52 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     Fragment mainFragment;
     Fragment currentFragment = null;
     int lastTabIndex = 0;
-    FragmentTransaction fragmentTransaction;
     ActionBar.Tab tMain, tWrite, tSetting;
+    long lastBackTime = 0;
+    int cFragmentsIndex = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActionBar bar = getSupportActionBar();
 
-        bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-        initFragment();
         initTab(bar);
+
+        showTabs(true);
     }
 
-    void initFragment() {
+    void getMainFragment(String tabName) {
+        Fragment inst = getFragment(tabName);
+        Bundle data = new Bundle();
+        data.putString("tabName", tabName);
+        inst.setArguments(data);
     }
 
     void initTab(ActionBar bar) {
-        tMain = appendTab(bar, "main");
-        tSetting = appendTab(bar, "option");
-        appendTab(bar, "debugdb");
+        tMain = appendTab(bar, "메인", new MainFragment());
+        appendTab(bar, "날짜순", new MemoDateOrderFragment());
+        appendTab(bar, "최근 편집", new MemoRecentOrderFragment());
+        appendTab(bar, "디버그", new DebugDBFragment());
     }
 
-    ActionBar.Tab appendTab(ActionBar bar, String text) {
+    ActionBar.Tab appendTab(ActionBar bar, String text, Fragment fragment) {
         ActionBar.Tab tab = bar.newTab().setText(text).setTabListener(this);
         bar.addTab(tab);
+
+        Bundle data = new Bundle();
+        data.putString("tabName", text);
+        fragment.setArguments(data);
+        mFragmentGlobal[cFragmentsIndex++] = fragment;
+
         return tab;
     }
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        fragmentTransaction = ft;
-        Fragment inst = null;
-        String tabName = tab.getText().toString();
         int index = tab.getPosition();
+        Fragment inst = mFragmentGlobal[index];
 
-        if (mFragmentGlobal[index] == null) {
-            inst = getFragment(tabName);
-            Bundle data = new Bundle();
-
-            data.putString("tabName", tabName);
-
-            inst.setArguments(data);
-            mFragmentGlobal[index] = inst;
-
-        } else {
-            inst = mFragmentGlobal[index];
-        }
-
-        changeFragment(inst);
+        changeFragmentWithoutChangeNavigation(inst);
     }
 
     Fragment getFragment(String tabName) {
@@ -92,12 +88,23 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
             iBackPress.onBackPressed();
         }
         else {
-            HUtils.showMessage(getApplicationContext(), "no cur");
+            long cTime = System.currentTimeMillis();
+            if (cTime - lastBackTime < 800) {
+                super.onBackPressed();
+            } else {
+                HUtils.showMessage(getApplicationContext(), "'뒤로' 버튼을 한번 더 누르면 종료됩니다");
+                lastBackTime = cTime;
+            }
         }
     }
 
     public void changeMainFragment() {
-        changeFragment(mFragmentGlobal[0]);
+        changeMainFragment(0);
+    }
+
+    public void changeMainFragment(int index) {
+        //changeFragment(mFragmentGlobal[index]);
+        showTabs(true);
     }
 
     public void changeWriteFragment() {
@@ -108,25 +115,27 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         changeFragment(writeFragment);
     }
 
-    public void changeWriteFragment(int id) {
-        HGlobal hGlobal = HGlobal.getInstance();
-        MemoDAO memoDAO = MemoDAO.getInstance(getApplicationContext());
+    public void showTabs(boolean show) {
+        ActionBar bar = getSupportActionBar();
 
-
-        Memo memo = memoDAO.getMemoById(id);
-        hGlobal.setMemoMode(MemoMode.SHOW, memo);
-        Fragment writeFragment = new WriteFragment(MemoMode.SHOW, memo);
-
-        changeFragment(writeFragment);
+        if (show) {
+            bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        } else {
+            bar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        }
     }
 
     public void changeFragment(Fragment fragment) {
+        changeFragmentWithoutChangeNavigation(fragment);
+        showTabs(false);
+    }
+
+    public void changeFragmentWithoutChangeNavigation(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         fragmentTransaction.replace(android.R.id.content, fragment).commit();
         currentFragment = fragment;
-        //showMessage("change: " + currentFragment);
     }
 
     public void showMessage(String text) {
