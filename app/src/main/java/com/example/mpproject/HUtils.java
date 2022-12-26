@@ -1,18 +1,29 @@
 package com.example.mpproject;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.SurfaceTexture;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Size;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,23 +40,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 
-
 public class HUtils {
 
     static public void showMessage(Context context, String text) {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
     }
 
-    static public void closeKeyboard(MainActivity activity)
-    {
+    static public void closeKeyboard(MainActivity activity) {
         View view = activity.getCurrentFocus();
         closeKeyboard(activity, view);
     }
 
-    static public void closeKeyboard(MainActivity activity, View view)
-    {
+    static public void closeKeyboard(MainActivity activity, View view) {
         if (view != null) {
-            InputMethodManager manager = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager manager = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
             manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
@@ -58,7 +66,7 @@ public class HUtils {
     }
 
     static public void showDeleteDialog(Context context, DialogInterface.OnClickListener positiveListener,
-                          DialogInterface.OnClickListener negativeListener) {
+                                        DialogInterface.OnClickListener negativeListener) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
         dialog.setTitle("삭제");
         dialog.setMessage("정말 삭제하시겠습니까?");
@@ -70,18 +78,18 @@ public class HUtils {
     static public void showLockDialog(Context context, LockLevel initLevel, Consumer<LockLevel> onSubmit, Runnable onCancel) {
         int initValue = lockLevelToDialogIndex(initLevel);
         AtomicInteger select = new AtomicInteger(initValue);
-        String[] options = new String[] { "잠금 안함", "마스터키 잠금", "개별키 잠금" };
+        String[] options = new String[]{"잠금 안함", "마스터키 잠금", "개별키 잠금"};
 
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
         dialog.setTitle("잠금");
 
-        dialog.setSingleChoiceItems(options,initValue, (d, i)->{
+        dialog.setSingleChoiceItems(options, initValue, (d, i) -> {
             select.set(i);
         });
-        dialog.setPositiveButton("확인", (d, i)-> {
+        dialog.setPositiveButton("확인", (d, i) -> {
             if (onSubmit != null) onSubmit.accept(DialogIndexToLockLevel(select.get()));
         });
-        dialog.setNegativeButton("취소", (d, i)-> {
+        dialog.setNegativeButton("취소", (d, i) -> {
             if (onCancel != null) onCancel.run();
 
         });
@@ -128,7 +136,7 @@ public class HUtils {
         dialog.show();
     }
 
-    public static void saveBitmap(Context context, Bitmap bitmap, String filename)  {
+    public static void saveBitmap(Context context, Bitmap bitmap, String filename) {
         File file = new File(context.getFilesDir(), filename);
         OutputStream os = null;
 
@@ -149,8 +157,7 @@ public class HUtils {
 
             Bitmap bitmap = BitmapFactory.decodeStream(fs);
             return bitmap;
-        }
-        catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
 
         }
@@ -160,9 +167,16 @@ public class HUtils {
 
     public static void deleteBitmap(String filename) {
         File file = new File(filename);
-        if(file.exists()) {
+        if (file.exists()) {
             file.delete();
         }
+    }
+
+    public void openCamera(Context context) throws CameraAccessException {
+        CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        String cameraId = manager.getCameraIdList()[0];
+        CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+        int level = characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
     }
 }
 

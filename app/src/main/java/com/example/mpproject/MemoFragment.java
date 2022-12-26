@@ -52,7 +52,9 @@ public class MemoFragment extends Fragment implements IFrag {
 
         edtTitle.setText(memo.title);
         edtContents.setText(memo.contents);
+        edtContents.setMinimumHeight(2000);
         setPicture(memo.image);
+
     }
 
     protected void initView() {

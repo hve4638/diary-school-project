@@ -1,30 +1,39 @@
 package com.example.mpproject;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.appcompat.widget.PopupMenu;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import java.io.File;
 import java.io.InputStream;
 
 public class EditMemoFragment extends MemoFragment {
     static final int REQUEST_GALLERY = 1;
+    static final int REQUEST_CAMERA = 2;
     MemoMode mode;
 
     public EditMemoFragment() {
@@ -46,6 +55,7 @@ public class EditMemoFragment extends MemoFragment {
 
         btnBack.setVisibility(View.GONE);
         btnEdit.setVisibility(View.GONE);
+        btnCamera.setVisibility(View.GONE);
         enableWritable(true);
     }
 
@@ -97,8 +107,10 @@ public class EditMemoFragment extends MemoFragment {
         }
     }
 
+
+
     void saveMemoNewMode() {
-        if (memo.title.equals("") && memo.contents.equals("")) return;
+        if (memo.hasNoContents()) return;
         memo.preprocess(context);
         memoDAO.addMemo(memo);
         showMessage("저장되었습니다");
@@ -114,7 +126,6 @@ public class EditMemoFragment extends MemoFragment {
         if (mode == MemoMode.NEW) {
             closeFragment();
         } else {
-            showMessage("hiii");
             changeFragment(new ShowMemoFragment(memo));
         }
     }
@@ -123,12 +134,15 @@ public class EditMemoFragment extends MemoFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case REQUEST_GALLERY:
-                onGallery(resultCode, data);
+                onActivityGallery(resultCode, data);
+                break;
+            case REQUEST_CAMERA:
+                onActivityCamera(resultCode, data);
                 break;
         }
     }
 
-    private void onGallery(int resultCode, Intent data) {
+    private void onActivityGallery(int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             try {
                 InputStream in = context.getContentResolver().openInputStream(data.getData());
@@ -142,6 +156,16 @@ public class EditMemoFragment extends MemoFragment {
             } catch (Exception ex) {
                 showMessage("오류가 발생했습니다");
             }
+        }
+    }
+
+    private void onActivityCamera(int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK) {
+            Bitmap img = (Bitmap) data.getExtras().get("data");
+            setPicture(img);
+            showMessage("ok???");
+        } else if (resultCode == Activity.RESULT_CANCELED) {
+            showMessage("canceled");
         }
     }
 }

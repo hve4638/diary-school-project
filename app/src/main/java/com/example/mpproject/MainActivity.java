@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.Window;
 
 import java.io.File;
@@ -32,6 +34,29 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
 
         initTab(bar);
         showTabs(true);
+
+        HGlobalSetting hGlobalSetting = HGlobalSetting.getInstance();
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.header, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch(item.getItemId())
+        {
+            case R.id.actSetting:
+                changeFragment(new SettingFragment());
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     void initTab(ActionBar bar) {

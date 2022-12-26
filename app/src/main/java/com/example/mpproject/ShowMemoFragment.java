@@ -50,6 +50,24 @@ public class ShowMemoFragment extends MemoFragment {
                 changeEditFragment();
             }
         });
+        edtTitle.setOnClickListener(doubleClickToEdit());
+        edtContents.setOnClickListener(doubleClickToEdit());
+    }
+
+    private View.OnClickListener doubleClickToEdit() {
+        return new View.OnClickListener() {
+            private long lastClickTime = 0;
+
+            @Override
+            public void onClick(View v) {
+                long clickTime = System.currentTimeMillis();
+                if (clickTime - lastClickTime < 500) {
+                    changeEditFragment();
+                }
+
+                lastClickTime = clickTime;
+            }
+        };
     }
 
     public void changeEditFragment() {

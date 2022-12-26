@@ -74,8 +74,16 @@ public class Memo {
         }
     }
 
+    public boolean hasNoContents() {
+        if (title.equals("") && contents.equals("") && image == null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private String makeFileName() {
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("ddMMyy-hhmmss");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat format = new SimpleDateFormat("ddMMyy-HHmmss");
         return "File-" + format.format(new Date()) + ".jpeg";
     }
 
