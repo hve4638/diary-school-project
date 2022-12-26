@@ -16,6 +16,15 @@
 
         </LinearLayout>
     </ScrollView>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:padding="150dp"
+        android:src="@drawable/ic_lock"
+        android:id="@+id/vMemoLock"
+        android:visibility="gone"
+        />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnAddMemo"

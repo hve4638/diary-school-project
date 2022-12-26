@@ -20,12 +20,12 @@ import java.io.File;
 @SuppressWarnings("deprecation")
 public class MainActivity extends AppCompatActivity implements ActionBar.TabListener {
     Fragment mFragmentGlobal[] = new Fragment[5];
-    Fragment mainFragment;
+    Fragment lockFragment = null;
     Fragment currentFragment = null;
-    int lastTabIndex = 0;
-    ActionBar.Tab tMain, tWrite, tSetting;
     long lastBackTime = 0;
     int cFragmentsIndex = 0;
+    boolean globalLock;
+    HGlobalSetting setting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,10 +33,9 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         ActionBar bar = getSupportActionBar();
 
         initTab(bar);
+        initSetting();
+
         showTabs(true);
-
-        HGlobalSetting hGlobalSetting = HGlobalSetting.getInstance();
-
     }
 
     @Override
@@ -51,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         switch(item.getItemId())
         {
             case R.id.actSetting:
-                changeFragment(new SettingFragment());
+                if (checkGlobalLock()) changeFragment(new SettingFragment());
                 return true;
 
             default:
@@ -60,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     }
 
     void initTab(ActionBar bar) {
+        lockFragment = new LockMemoFragment();
         appendTab(bar, "날짜순", new MemoDateOrderFragment());
         appendTab(bar, "최근 편집", new MemoRecentOrderFragment());
         appendTab(bar, "DEBUG", new DebugDBFragment());
@@ -76,12 +76,46 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         return tab;
     }
 
+    void initSetting() {
+        setting = HGlobalSetting.getInstance();
+        setting.load(getApplicationContext());
+
+        globalLock = setting.getGlobalLock();
+    }
+
+    public boolean checkGlobalLock() {
+        return checkGlobalLock(()->{});
+    }
+
+    public boolean checkGlobalLock(Runnable runnable) {
+        if (globalLock) {
+            HUtils.showInputPasswdDialog(this, "잠금 해제", (text) -> {
+                String key = setting.getMasterKey();
+                if (text.equals(key)) {
+                    globalLock = false;
+                    runnable.run();
+                } else {
+                    showMessage("비밀번호가 일치하지 않습니다");
+                    checkGlobalLock(runnable);
+                }
+            });
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
         int index = tab.getPosition();
         Fragment inst = mFragmentGlobal[index];
 
-        changeFragmentWithoutChangeNavigation(inst);
+        if (globalLock) {
+            changeFragmentWithoutChangeNavigation(lockFragment);
+        } else {
+            changeFragmentWithoutChangeNavigation(inst);
+        }
+
     }
 
     @Override
@@ -111,14 +145,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
     }
 
     public void changeMainFragment(int index) {
-        //changeFragment(mFragmentGlobal[index]);
         showTabs(true);
-    }
-
-    public void changeWriteFragment() {
-        Fragment writeFragment = new EditMemoFragment();
-
-        changeFragment(writeFragment);
     }
 
     public void showTabs(boolean show) {

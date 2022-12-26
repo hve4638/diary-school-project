@@ -27,7 +27,14 @@ public class DebugDBFragment extends Fragment {
         TextView tView = (TextView)vMain.findViewById(R.id.tDebugDB);
         MemoDAO memoDAO = MemoDAO.getInstance(context);
 
-        String str = memoDAO.dbgGetAllMemo();
+        HGlobalSetting setting = HGlobalSetting.getInstance();
+        String str = "";
+
+        str += "MasterKey : " + setting.getMasterKey() + "\n";
+        str += "GlobalLock : " + setting.getGlobalLock() + "\n";
+        str += "\n\n\n\n";
+
+        str += memoDAO.dbgGetAllMemo();
         tView.setText(str);
 
         return vMain;

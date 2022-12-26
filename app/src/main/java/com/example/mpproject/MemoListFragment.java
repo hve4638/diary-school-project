@@ -87,7 +87,14 @@ public class MemoListFragment extends Fragment {
     }
 
     void changeFragmentIfPasswdCorrect(Memo memo) {
-        String passwd = memo.passwd;
+        String passwd;
+        if (memo.lockLevel == LockLevel.MASTER_KEY) {
+            HGlobalSetting setting = HGlobalSetting.getInstance();
+            passwd = setting.getMasterKey();
+        } else {
+            passwd = memo.passwd;
+        }
+
         HUtils.showInputPasswdDialog(context, (text) -> {
             if (text.equals(passwd)) {
                 changeFragment(new ShowMemoFragment(memo));

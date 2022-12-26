@@ -33,23 +33,33 @@ public class HGlobalSetting {
     }
 
     public void setGlobalLock(boolean lock) {
-        map.put("global-lock", (lock) ? "true" : "false");
+        map.put("global-lock", (lock) ? "T" : "F");
     }
 
     public boolean getGlobalLock() {
         String key = map.get("global-lock");
-        if (key == null) key = "false";
-        return (key == "true") ? true : false;
+
+        if (key == null) return false;
+        return (key.equals("T")) ? true : false;
     }
 
-    public void save() {
-        FileMap fm = new FileMap("option.csv");
-        fm.write(map);
+    public void save(Context context) {
+        FileMap fm = new FileMap(context, "option.csv");
+
+        if (fm.write(map)) {
+            HUtils.showMessage(context, "SUCCESS SAVE: " + fm.path);
+        } else {
+            HUtils.showMessage(context, "FAIL TO SAVE: " + fm.path);
+        }
     }
 
-    public void load() {
-        FileMap fm = new FileMap("option.csv");
-        fm.read(map);
+    public void load(Context context) {
+        FileMap fm = new FileMap(context, "option.csv");
+        if (fm.read(map)) {
+            HUtils.showMessage(context, "SUCCESS LOAD: " + fm.path);
+        } else {
+            HUtils.showMessage(context, "FAIL TO LOAd: " + fm.path);
+        }
     }
 
 }

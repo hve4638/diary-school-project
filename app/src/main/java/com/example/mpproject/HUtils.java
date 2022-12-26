@@ -120,10 +120,15 @@ public class HUtils {
         }
     }
 
+
     static public void showInputPasswdDialog(Context context, Consumer<String> onSubmit) {
+        showInputPasswdDialog(context, "비밀번호 입력", onSubmit);
+    }
+
+    static public void showInputPasswdDialog(Context context, String title, Consumer<String> onSubmit) {
         View dialogView = (View) View.inflate(context, R.layout.dialog_input, null);
         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
-        dialog.setTitle("비밀번호 입력");
+        dialog.setTitle(title);
         dialog.setView(dialogView);
         dialog.setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override
