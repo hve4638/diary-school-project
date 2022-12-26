@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
@@ -76,9 +77,9 @@ public class MemoFragment extends Fragment implements IFrag {
         btnOption.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PopupMenu popup = new PopupMenu(context, v);
+                Context wrapper = new ContextThemeWrapper(context, R.style.PopUp);
+                PopupMenu popup = new PopupMenu(wrapper,  v);
                 popup.getMenuInflater().inflate(R.menu.popup, popup.getMenu());
-                
 
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(MenuItem item) {

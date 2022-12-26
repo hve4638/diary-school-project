@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         super.onCreate(savedInstanceState);
         ActionBar bar = getSupportActionBar();
 
+
         initTab(bar);
         initSetting();
 
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         setting.load(getApplicationContext());
 
         globalLock = setting.getGlobalLock();
+        //showMessage(": " + setting.getMasterKey());
     }
 
     public boolean checkGlobalLock() {

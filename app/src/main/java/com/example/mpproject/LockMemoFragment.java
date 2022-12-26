@@ -26,6 +26,7 @@ public class LockMemoFragment extends MemoListFragment {
         super.init();
 
         scrollList.setVisibility(View.GONE);
+        btnAddMemo.setVisibility(View.GONE);
         vMemoLock.setVisibility(View.VISIBLE);
         vMemoLock.setOnClickListener(new View.OnClickListener() {
             @Override

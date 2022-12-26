@@ -2,7 +2,9 @@ package com.example.mpproject;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -71,8 +74,18 @@ public class EditMemoFragment extends MemoFragment {
                         memo.setDate(year, month, day);
                     }
                 };
-                DatePickerDialog dialog = new DatePickerDialog(context , listener, memo.getYear(), memo.getMonth(), memo.getDay());
+
+                //AlertDialog.THEME_HOLO_LIGHT
+                DatePickerDialog dialog = new DatePickerDialog(context, listener, memo.getYear(), memo.getMonth(), memo.getDay());
+                DatePicker datePicker = dialog.getDatePicker();
+
                 dialog.show();
+
+                dialog.getWindow().getDecorView().setBackgroundColor(Color.argb(255, 100, 100, 100));
+                //int h = dialog.getWindow().getDecorView().getHeight();
+                //int ww = dialog.getWindow().getDecorView().get();
+                //System.out.println("  >>>>>>>>>>>>>> # "+ w + ", "+ h);
+
             }
         });
         btnSubmit.setOnClickListener(new View.OnClickListener() {
