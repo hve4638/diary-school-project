@@ -1,7 +1,9 @@
 package com.example.mpproject;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -9,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
+import androidx.core.content.ContextCompat;
 
 import java.text.SimpleDateFormat;
 
@@ -119,6 +122,7 @@ public class HLayout {
         if (memo.lockLevel == LockLevel.NOTHING) {
             lock.setVisibility(View.INVISIBLE);
         }
+
         layout.addView(col1);
         layout.addView(lock);
         layout.addView(weightLayout(1f));
@@ -127,11 +131,22 @@ public class HLayout {
         TextView titleView = (TextView)wrappedTextViewExtSize(memo.title, 20);
         TextView dateView = (TextView)wrappedTextViewExtSize(getDateString(memo), 10);
 
+        int color = getThemeColor(com.google.android.material.R.attr.colorOnSecondary);
+        titleView.setTextColor(color);
+        dateView.setTextColor(color);
+
         col1.addView(titleView);
         col2.addView(weightLayout(1f));
         col2.addView(dateView);
 
+
         return layout;
+    }
+
+    int getThemeColor(int res) {
+        TypedValue typedValue = new TypedValue();
+        context.getTheme().resolveAttribute(res, typedValue, true);
+        return ContextCompat.getColor(context, typedValue.resourceId);
     }
 
     private String getDateString(Memo memo) {
@@ -148,6 +163,9 @@ public class HLayout {
         iView.setBackground(null);
         iView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         iView.setPadding(20, 5, 20, 5);
+
+        int color = getThemeColor(com.google.android.material.R.attr.colorOnSecondary);
+        iView.setColorFilter(color);
 
         return iView;
     }

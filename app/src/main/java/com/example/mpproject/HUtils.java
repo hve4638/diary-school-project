@@ -18,12 +18,14 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Size;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -139,6 +141,13 @@ public class HUtils {
         });
         dialog.setNegativeButton("취소", null);
         dialog.show();
+    }
+
+
+    public static int getThemeColor(Context context, int res) {
+        TypedValue typedValue = new TypedValue();
+        context.getTheme().resolveAttribute(res, typedValue, true);
+        return ContextCompat.getColor(context, typedValue.resourceId);
     }
 
     public static void saveBitmap(Context context, Bitmap bitmap, String filename) {

@@ -154,6 +154,10 @@ public class MemoDAO {
 
         return str;
     }
+
+    public void deleteAllMemo() {
+        writable.delete("memo", "", new String[] {});
+    }
 }
 
 class MemoDBHelper extends SQLiteOpenHelper {

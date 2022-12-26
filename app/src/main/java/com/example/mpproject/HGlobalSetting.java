@@ -47,18 +47,14 @@ public class HGlobalSetting {
         FileMap fm = new FileMap(context, "option.csv");
 
         if (fm.write(map)) {
-            HUtils.showMessage(context, "SUCCESS SAVE: " + fm.path);
         } else {
-            HUtils.showMessage(context, "FAIL TO SAVE: " + fm.path);
         }
     }
 
     public void load(Context context) {
         FileMap fm = new FileMap(context, "option.csv");
         if (fm.read(map)) {
-            HUtils.showMessage(context, "SUCCESS LOAD: " + fm.path);
         } else {
-            HUtils.showMessage(context, "FAIL TO LOAd: " + fm.path);
         }
     }
 

@@ -13,6 +13,7 @@
         android:layout_weight="1"
         android:id="@+id/edtInput"
         android:layout_gravity="center"
+        android:textColor="?colorOnSecondary"
         />
     <View
         android:layout_width="20sp"

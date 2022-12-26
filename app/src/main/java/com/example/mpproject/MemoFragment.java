@@ -78,6 +78,7 @@ public class MemoFragment extends Fragment implements IFrag {
             public void onClick(View v) {
                 PopupMenu popup = new PopupMenu(context, v);
                 popup.getMenuInflater().inflate(R.menu.popup, popup.getMenu());
+                
 
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     public boolean onMenuItemClick(MenuItem item) {

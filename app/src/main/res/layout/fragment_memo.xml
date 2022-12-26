@@ -13,8 +13,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="#393939"
             android:orientation="horizontal"
+            android:background="?colorPrimaryVariant"
             >
             <ImageButton
                 android:id="@+id/btnEditSubmit"

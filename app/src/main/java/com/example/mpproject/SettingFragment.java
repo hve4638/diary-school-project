@@ -15,7 +15,7 @@ public class SettingFragment extends Fragment implements IFrag {
     protected Context context;
     protected HGlobalSetting setting;
     protected HLayout hLayout;
-    LinearLayout btnGlobalLock, btnChangeMasterKey;
+    LinearLayout btnGlobalLock, btnChangeMasterKey, btnCleanMemo;
     CheckBox checkboxGlobalLock;
 
     public SettingFragment() {
@@ -49,6 +49,7 @@ public class SettingFragment extends Fragment implements IFrag {
         btnGlobalLock = vMain.findViewById(R.id.btnSetGlobalLock);
         btnChangeMasterKey = vMain.findViewById(R.id.btnChangeMasterKey);
         checkboxGlobalLock = vMain.findViewById(R.id.checkboxGlobalLock);
+        btnCleanMemo = vMain.findViewById(R.id.btnCleanMemo);
     }
 
     void initViewListener() {
@@ -63,6 +64,22 @@ public class SettingFragment extends Fragment implements IFrag {
             @Override
             public void onClick(View v) {
                 onChangeMasterKey();
+            }
+        });
+        btnCleanMemo.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                HUtils.showDeleteDialog(context, (dialog, which) -> {
+                    HUtils.showInputPasswdDialog(context, "마스터 키 입력", (text) -> {
+                        HGlobalSetting setting = HGlobalSetting.getInstance();
+                        String key = setting.getMasterKey();
+                        if (key.equals(text)) {
+                            MemoDAO.getInstance(context).deleteAllMemo();
+                            showMessage("모든 메모를 삭제했습니다");
+                        } else {
+                            showMessage("비밀번호가 일치하지 않습니다");
+                        }
+                    });
+                }, null);
             }
         });
     }

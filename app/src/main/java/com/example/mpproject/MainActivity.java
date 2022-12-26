@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements ActionBar.TabList
         lockFragment = new LockMemoFragment();
         appendTab(bar, "날짜순", new MemoDateOrderFragment());
         appendTab(bar, "최근 편집", new MemoRecentOrderFragment());
-        appendTab(bar, "DEBUG", new DebugDBFragment());
+        //appendTab(bar, "DEBUG", new DebugDBFragment());
     }
 
     ActionBar.Tab appendTab(ActionBar bar, String text, Fragment fragment) {
